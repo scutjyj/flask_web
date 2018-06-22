@@ -1,0 +1,15 @@
+<p>
+Dear {{ user.username }},<br />
+
+Welcome to Myblog!<br />
+
+To confirm your account please click on the following link:<br />
+
+{{ url_for('auth.confirm', token=token, _external=True) }}<br />
+
+Sincerely,<br />
+
+Jianyj.<br />
+
+Note: replies to this email address are not monitored.<br />
+</p>
