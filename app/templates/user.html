@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Myblog - {{ user.username }}{% endblock %}
 {% block page_content %}
-<div class="page-header">
+    <div class="page-header align-left">
+    <img src="{{ user.gravatar(size=256) }}" class="img-rounded profile-thumbnail">
+    </div>
+<div class="page-header align-right">
     <h1>{{ user.username }}</h1>
     {% if user.name or user.location %}
     <p>
