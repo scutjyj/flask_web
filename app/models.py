@@ -122,6 +122,10 @@ class User(UserMixin, db.Model):
         if self.email is not None and self.avatar_hash is None:
             self.avatar_hash = hashlib.md5(self.email.encode('utf-8')).hexdigest()
 
+    @property
+    def followed_post(self):
+        return Post.query.join(Follow, Follow.followed_id == Post.author_id).filter(Follow.follower_id == self.id)
+
     def follow(self, user):
         if not self.is_following(user):
             f = Follow(follower=self, followed=user)

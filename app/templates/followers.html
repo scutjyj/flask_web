@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+{% block title %}Myblog - {{ title }} {{ user.username }}{% endblock %}
+{% block page_content %}
+<div class="container">
+    <h3>{{ title }} {{ user.username }}</h3>
+    {% for follow in follows %}
+    <hr />
+    <div class="row">
+        <div class="profile-thumbnail col-sm-1">
+            <div class="row">
+                <a href="{{ url_for('.user', username=follow['user'].username) }}">
+                    <img class="img-rounded profile-thumbnail" src="{{ follow['user'].gravatar(size=64) }}">
+                </a>
+            </div>
+            <div class="row">
+                <a href="{{ url_for('.user', username=follow['user'].username) }}">
+                    {{ follow['user'].username }}
+                </a>
+            </div>
+        </div>
+        <div class="col-sm-10">
+            <p>
+                {% if follow['user'].location %}
+                    From <a href="http://maps.google.com/?q={{ user.location }}">{{ follow['user'].location }}</a>
+                {% endif %}
+            </p>
+            {% if follow['user'].about_me %}<p>{{ follow['user'].about_me }}</p>{% endif %}
+            <div class="follow-date">
+                {{ title }} {{ follow['user'].username }} at {{ moment(follow['timestamp']).fromNow() }}.
+            </div>
+            <div class="follow-footer">
+                {% if current_user.is_authenticated and current_user == follow['user'] %}
+                    {% if endpoint[1:] == 'followers' %}
+                        <a href="{{ url_for('.follow', username=follow['user'].username)}}">
+                            <span class="label label-primary">Follow</span>
+                        </a>
+                    {% elif endpoint[1:] == 'followed_by' %}
+                        <a href="{{ url_for('.unfollow', username=follow['user'].username)}}">
+                            <span class="label label-primary">Unfollow</span>
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <hr />
+</div>
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, endpoint, username=username) }}
+</div>
+{% endblock %}
