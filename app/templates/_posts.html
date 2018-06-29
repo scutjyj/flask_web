@@ -1,5 +1,4 @@
 {% for post in posts %}
-<hr />
 <div class="row">
     <div class="profile-thumbnail col-sm-1">
         <a href="{{ url_for('.user', username=post.author.username) }}">
@@ -33,8 +32,13 @@
             <a href="{{ url_for('.post', id=post.id) }}">
                 <span class="label label-default">Permalink</span>
             </a>
+            <a href="{{ url_for('.post', id=post.id) }}#comments">
+                <span class="label label-primary">
+                    {{ post.comments.count() }} Comments
+                </span>
+            </a>
         </div>
     </div>
 </div>
-{% endfor %}
 <hr />
+{% endfor %}
