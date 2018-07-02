@@ -1,8 +1,8 @@
-import unittest
+import unittest, json
 from app import create_app, db
-from app.models import Role
+from app.models import Role, User
 from base64 import b64encode
-
+from flask import url_for
 
 class APITestCase(unittest.TestCase):
     def setUp(self):
@@ -26,4 +26,27 @@ class APITestCase(unittest.TestCase):
         }
 
     def test_no_auth(self):
-        pass
+        response = self.client.get(url_for('api.get_posts'), content_type='application/json')
+        #print response.status_code
+        #self.assertTrue(response.status_code == 401)
+        self.assertFalse(response.status_code == 401)
+
+    def test_posts(self):
+        r = Role.query.filter_by(name='User').first()
+        self.assertIsNotNone(r)
+        u = User(email='john@example.com', password='123', confirmed=True, role=r)
+        db.session.add(u)
+        db.session.commit()
+
+        response = self.client.post(url_for('api.new_post'), headers=self.get_api_headers('john@example.com', '123'),
+                                    data=json.dumps({'body': 'body of the *blog* post'}))
+        self.assertTrue(response.status_code == 201)
+        url = response.headers.get('Location')
+        self.assertIsNotNone(url)
+
+        response = self.client.get(url, headers=self.get_api_headers('john@example.com', '123'))
+        self.assertTrue(response.status_code == 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertTrue(json_response['url'] == url)
+        self.assertTrue(json_response['body'] == 'body of the *blog* post')
+        self.assertTrue(json_response['body_html'] == '<p>body of the <em>blog</em> post</p>')
