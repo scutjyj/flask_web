@@ -1,0 +1,2 @@
+recursive-include app/templates *
+include . *.py
