@@ -1,18 +1,18 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
 from ..models import User
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 64), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Log In')
 
 
-class RegistrationForm(Form):
+class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 64), Email()])
     username = StringField('Username', validators=[
         DataRequired(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
@@ -32,7 +32,7 @@ class RegistrationForm(Form):
             raise ValidationError('Username already in use.')
 
 
-class ModifyPasswordForm(Form):
+class ModifyPasswordForm(FlaskForm):
     old_password = PasswordField('Old Password', validators=[DataRequired()])
     new_password = PasswordField('New Password', validators=[DataRequired(),
                                                              EqualTo('new_password2', message='Passwords must match.')])
@@ -40,7 +40,7 @@ class ModifyPasswordForm(Form):
     submit = SubmitField('Modify Password')
 
 
-class ForgetPasswordForm(Form):
+class ForgetPasswordForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 64), Email()])
     submit = SubmitField('Submit')
 
@@ -49,7 +49,7 @@ class ForgetPasswordForm(Form):
             raise ValidationError('This email has not been registered.')
 
 
-class ResetPasswordForm(Form):
+class ResetPasswordForm(FlaskForm):
     new_password = PasswordField('New Password', validators=[DataRequired(),
                                                              EqualTo('new_password2', message='Passwords must match.')])
     new_password2 = PasswordField('Confirm password', validators=[DataRequired()])

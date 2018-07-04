@@ -1,12 +1,13 @@
-from flask import render_template, session, redirect, url_for, abort, flash, request, current_app, make_response
+from flask import render_template, session, redirect, url_for, abort, flash, request, current_app, make_response, send_from_directory, send_file
 from flask_login import login_required, current_user
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm, UploadForm
 from .. import db
 from ..models import User, Permission, Role, Post, Comment
 from ..decorators import admin_required, permission_required
 from flask_sqlalchemy import get_debug_queries
-
+from werkzeug.utils import secure_filename
+import os
 
 @main.after_app_request
 def after_request(response):
@@ -260,3 +261,23 @@ def server_shutdown():
     return 'Shutting down...'
 
 
+@main.route('/uploads', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(url_for('.upload_file'))
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(url_for('.upload_file'))
+        if file and '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('.uploaded_file', filename=filename))
+    return render_template('upload.html')
+
+
+@main.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_file(os.path.join(current_app.config['UPLOAD_FOLDER'], filename), as_attachment=True)
