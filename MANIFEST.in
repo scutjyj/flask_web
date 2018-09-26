@@ -1,2 +1,5 @@
-recursive-include app/templates *
-include . *.py
+recursive-include requirements *.txt
+include *.py *.txt
+graft app
+global-exclude *.pyc
+
