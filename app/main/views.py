@@ -8,6 +8,8 @@ from ..decorators import admin_required, permission_required
 from flask_sqlalchemy import get_debug_queries
 from werkzeug.utils import secure_filename
 import os
+from time import time
+
 
 @main.after_app_request
 def after_request(response):
@@ -34,11 +36,15 @@ def index():
         query = current_user.followed_posts
     else:
         query = Post.query
+    #query_s = time()
     pagination = query.order_by(Post.timestamp.desc()).paginate(
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+    #print 'the query procedure takes: %s seconds' % str(time()-query_s)
     posts = pagination.items
-    return render_template('index.html', form=form, posts=posts,
-                           show_followed=show_followed, pagination=pagination)
+    #render_s = time()
+    ret = render_template('index.html', form=form, posts=posts, show_followed=show_followed, pagination=pagination)
+    #print 'the render procedure takes: %s seconds' % str(time()-render_s)
+    return ret
 
 
 @main.route('/admin')
